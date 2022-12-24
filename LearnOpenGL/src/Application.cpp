@@ -2,14 +2,59 @@
 #include<iostream>
 #include "glfw3.h"
 
-unsigned int createshader(unsigned int type, const char* &source)
+#include<fstream>
+#include<string>
+#include<sstream>
+struct ShaderProgramSource
+{
+	std::string VertexSource;
+	std::string FragmentSource;
+	
+};
+static ShaderProgramSource ParseShader(const std::string& filepath)
+{
+    std::ifstream stream(filepath);
+    
+    enum class Shadertype
+    {
+		NONE = -1, VERTEX = 0, FRAGMENT = 1
+	};
+    
+    
+    std::string line;
+    std::stringstream ss[2];
+    
+	Shadertype type = Shadertype::NONE;
+    
+    while (getline(stream, line))
+    {
+		if (line.find("#shader") != std::string::npos)
+		{
+			if(line.find("vertex")!=std::string::npos)
+			{
+                type = Shadertype::VERTEX;
+			}
+			else if (line.find("fragment") != std::string::npos)
+			{
+                type = Shadertype::FRAGMENT;
+			}
+		}
+        else
+        {
+            ss[(int)type] << line << '\n';
+        }
+    }
+    return { ss[0].str(),ss[1].str() };
+}
+unsigned int createshader(unsigned int type, const std::string& source)
 {
     unsigned int shader = glCreateShader(type);
-    glShaderSource(shader, 1, &source, NULL);
+	const char* src = source.c_str();
+    glShaderSource(shader, 1, &src, NULL);
     glCompileShader(shader);
     return shader;
 }
-unsigned int createshaderprogram(const char*& vertexshader, const char*& fragmentshader)
+unsigned int createshaderprogram(std::string& vertexshader, std::string& fragmentshader)
 {
     int program = glCreateProgram();
     unsigned int vs = createshader(GL_VERTEX_SHADER, vertexshader);
@@ -65,24 +110,11 @@ int main(void)
     glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     
-    //vertex shader code
-    const char* vertexShaderSource = "#version 330 core\n"
-        "layout (location = 0) in vec4 aPos;\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = aPos;\n"
-        "}\0";
     
-	//fragment shader code
+    ShaderProgramSource source = ParseShader("Resources/Shaders/basics.shader");
+   
     
-    const char* fragmentShaderSource = "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main()\n"
-        "{\n"
-        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-        "}\n\0";
-
-    unsigned int program = createshaderprogram(vertexShaderSource, fragmentShaderSource);
+    unsigned int program = createshaderprogram(source.VertexSource,source.FragmentSource);
     glLinkProgram(program);
     glUseProgram(program);
     
