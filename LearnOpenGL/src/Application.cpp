@@ -2,7 +2,27 @@
 #include<iostream>
 #include "glfw3.h"
 
-
+unsigned int createshader(unsigned int type, const char* &source)
+{
+    unsigned int shader = glCreateShader(type);
+    glShaderSource(shader, 1, &source, NULL);
+    glCompileShader(shader);
+    return shader;
+}
+unsigned int createshaderprogram(const char*& vertexshader, const char*& fragmentshader)
+{
+    int program = glCreateProgram();
+    unsigned int vs = createshader(GL_VERTEX_SHADER, vertexshader);
+    unsigned int fs = createshader(GL_FRAGMENT_SHADER, fragmentshader);
+    glAttachShader(program, vs);
+    glAttachShader(program, fs);
+    glLinkProgram(program);
+    glValidateProgram(program);
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+    return program;
+    
+}
 void ProcessInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
@@ -44,6 +64,28 @@ int main(void)
 	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), vertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    
+    //vertex shader code
+    const char* vertexShaderSource = "#version 330 core\n"
+        "layout (location = 0) in vec4 aPos;\n"
+        "void main()\n"
+        "{\n"
+        "   gl_Position = aPos;\n"
+        "}\0";
+    
+	//fragment shader code
+    
+    const char* fragmentShaderSource = "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "void main()\n"
+        "{\n"
+        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+        "}\n\0";
+
+    unsigned int program = createshaderprogram(vertexShaderSource, fragmentShaderSource);
+    glLinkProgram(program);
+    glUseProgram(program);
+    
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -53,7 +95,7 @@ int main(void)
         
 		glDrawArrays(GL_TRIANGLES, 0, 3);
         
-
+		
        
         
         /* Swap front and back buffers */
