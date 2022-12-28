@@ -4,7 +4,8 @@
 #include<fstream>
 #include<string>
 #include<sstream>
-
+#include "indexbuffer.h"
+#include "vertexbuffer.h"
 struct ShaderProgramSource
 {
 	std::string VertexSource;
@@ -98,10 +99,10 @@ int main(void)
     }
     //Positions of triangle points
 	float vertices[] = {
-     0.5f,  0.5f,  // top right
-     0.5f, -0.5f, // bottom right
-    -0.5f, -0.5f,  // bottom left
-	-0.5f,  0.5f  // top left
+     0.5f,  0.5f,1.0f,0.0f,0.0f,1.0f,  // top right
+     0.5f, -0.5f,0.0f,1.0f,0.0f,1.0f, // bottom right
+    -0.5f, -0.5f,0.0f,0.0f,1.0f,1.0f, // bottom left
+	-0.5f,  0.5f,1.0f,1.0f,1.0f,1.0f // top left
 	};
     unsigned int indices[] = {
          0, 1, 3,   // first triangle
@@ -116,19 +117,19 @@ int main(void)
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
     //vertex buffer object
-    unsigned int VBO;
-    glGenBuffers(1, &VBO); 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), vertices, GL_STATIC_DRAW);
+   // unsigned int VBO;
+    vertexbuffer VBO(vertices,24*sizeof(float));
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+   
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
   
     //vertex index array (indexes of vertices)
-    unsigned int ibo;
-    glGenBuffers(1, &ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
-    
+   
+    indexbuffer ibo(indices, 6);
+    ibo.bind();
     
     
     
