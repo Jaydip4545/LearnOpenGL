@@ -139,18 +139,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\indexbuffer.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\vertexarray.cpp" />
     <ClCompile Include="src\vertexbuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\basics.shader" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\shader.h" />
     <ClInclude Include="src\indexbuffer.h" />
     <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\vertexarray.h" />
     <ClInclude Include="src\vertexbuffer.h" />
+    <ClInclude Include="src\vertexbufferlayout.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
