@@ -10,9 +10,19 @@ shader::shader(const std::string filepath): m_filepath(filepath),m_rendererID(0)
     m_rendererID = createshaderprogram(source.VertexSource, source.FragmentSource);
 }
 
-void shader::setuniform4f(const std::string name, float v0, float v1, float v2, float v3)
+void shader::setuniform4f(const std::string& name, float v0, float v1, float v2, float v3)
 {
     glUniform4f(getuniformlocation(name), v0, v1, v2, v3);
+}
+
+void shader::setuniform1f(const std::string& name, int value)
+{
+    glUniform1f(getuniformlocation(name), value);
+}
+
+void shader::setuniform1i(const std::string& name, int value)
+{
+    glUniform1i(getuniformlocation(name), value);
 }
 
 unsigned int shader::createshader(unsigned int type, const std::string& source)
@@ -98,6 +108,6 @@ unsigned int shader::getuniformlocation(const std::string& name)
 {
     int location = glGetUniformLocation(m_rendererID, name.c_str());
     if (location == -1)
-        std::cout << "Warning : Uniform " << name << " doesn't exist!!" << std::endl;
+        //std::cout << "Warning : Uniform " << name << " doesn't exist!!" << std::endl;
     return location;
 }

@@ -20,7 +20,9 @@ public:
 	void unbind();
 
 	//set uniforms
-	void setuniform4f(const std::string name, float v0, float v1, float v2, float v3);
+	void setuniform4f(const std::string &name, float v0, float v1, float v2, float v3);
+	void setuniform1i(const std::string &name, int value);
+	void setuniform1f(const std::string& name, int value);
 	unsigned int createshader(unsigned int type, const std::string& source);
 	unsigned int createshaderprogram(std::string& vertexshader, std::string& fragmentshader);
 	ShaderProgramSource ParseShader(const std::string& filepath);
