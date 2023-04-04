@@ -1,46 +1,50 @@
-#include "glew.h"
-#include "glfw3.h"
+#include "glew.h"//functions for modern opengl , always include glew or glad or any other
+//libraries that contains opengl before glfw because glfw requires opengl to be included first
+#include "glfw3.h" //used to create window
 #include<iostream>
 #include<fstream>
 #include<string>
 #include<sstream>
-#include "indexbuffer.h"
-#include "vertexbuffer.h"
-#include "vertexarray.h"
-#include "shader.h"
+#include "indexbuffer.h" // index buffer class
+#include "vertexbuffer.h" // vertex buffer class
+#include "vertexarray.h" //use to define vertex attributes
+#include "shader.h" //shader class to compile and bind different shaders
 #include "Renderer.h"
-#include "Texture.h"
+#include "Texture.h" 
 #include <cmath>
-#include "particle.h"
 #include "algorithm"
-#include "physics.h"
-float r = 0.7971;
+#include "glm/glm.hpp" // maths library specific for opengl maths
+#include "glm/gtc/matrix_transform.hpp"
+#include "Camera.h"
+int screen_wigth  = 2500;
+int screen_height = 1400;
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f;
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void ProcessInput(GLFWwindow* window);
 
-void update(particle* p, int n, float& DeltaTime)
-{
-    //Earth_Gravity(p, n, DeltaTime);
-    collision(p, n, DeltaTime);
-   
-}
+//camera 
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float lastX = screen_wigth / 2.0f;
+float lastY = screen_height / 2.0f;
+bool firstMouse = true;
 
-void ProcessInput(GLFWwindow* window)
-{
-	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
-	{  
-		glfwSetWindowShouldClose(window, true);
-	}
-}
+
+
 int main(void)
 {
     GLFWwindow* window;
-
+   
     /* Initialize the library */
     if (!glfwInit())
         return -1;
 	
+    
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1200, 1200, "Application", NULL, NULL);
-   
+    window = glfwCreateWindow(screen_wigth, screen_height, "Application", NULL, NULL);
+    glfwSetWindowPos(window, 50, 50);//glfwwindow will be rendered on the give coordinates 
     //fix frame rate
    
     
@@ -50,125 +54,182 @@ int main(void)
         return -1;
     }
     //Positions of triangle points
-    int number_of_objects = 40;
-    particle prtcls[3000];
-    float c_x = -0.84;
-    float c_y = 0.84;
-    for (int i = 0; i < number_of_objects; i++)
-    {
-        float v_x = (rand() - RAND_MAX / 2.0) / (500*RAND_MAX);
-        float v_y = (rand() - RAND_MAX / 2.0) / (500*RAND_MAX);
-        float r = (rand() - RAND_MAX / 2.0) / (5*RAND_MAX);
+  
+    float cube_coordinates[] = {
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-        prtcls[i].set_center(c_x, c_y);
-        prtcls[i].set_valocity_x(v_x);
-        prtcls[i].set_valocity_y(v_y);
-        prtcls[i].set_radius(abs(0.05));
-        prtcls[i].set_mass(abs(r * 10));
-        if (c_x + 0.15 >= 0.84)
-        {
-            c_x = -0.96;
-            c_y -= 0.15;
-        }
-        else
-        {
-            c_x += 0.25;
-        }
-       
-       
-        //std::cout << r * 10 << std::endl;
-    }
-    float* circle_points_p[3000];
-	float vertices[] = {
-     -0.5f,  -0.5f,0.0f,  0.0f,  // top right
-     0.5f, -0.5f,1.0f, 0.0f, // bottom right
-     0.5f, 0.5f,1.0f, 1.0f, // bottom left
-    -0.5f,  0.5f,0.0f, 1.0f // top left
-	};
-    unsigned int indices[] = {
-         0, 1, 2,   // first triangle
-         2, 3, 0
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
-    
-    //
-    float points[10000];
+    glm::vec3 lightPos(1.2f, 4.5f, 4.0f);
+    glm::vec3 objectPos(1.0f, 1.3f, 1.2f);
    
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
     glewInit();
-    glViewport(0, 0, 1200, 1200);
+    glViewport(0, 0, screen_wigth, screen_height);
     //glfwSwapInterval(1);
-    
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+
+    // tell GLFW to capture our mouse
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
     //blending
 
     glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
 
-    vertexarray va;
-    vertexbuffer VBO(vertices,16*sizeof(float));
-    vertexbufferlayout layout;
-    layout.push<float>(2);
-    layout.push<float>(2);
-    //layout.push<float>(1);
-    va.addbuffer(VBO, layout);
+    
+    glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+    model = glm::rotate(model, glm::radians(55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::translate(model, lightPos);
+   // model = glm::scale(model, glm::vec3(0.2));
+    //glm::mat4 view;
+    view = camera.GetViewMatrix();
+    projection = glm::perspective(glm::radians(45.0f), (float)screen_wigth / (float)screen_height, 0.1f, 100.0f);
    
+   
+   
+    //layout.push<float>(1);
+    
     //vertex index array (indexes of vertices)
-    indexbuffer ibo(indices, 6);
+    vertexbuffer vbo(cube_coordinates, 8 * 36 * sizeof(float));
+    vertexarray va_object;
+    vertexbufferlayout object_layout;
+    object_layout.push<float>(3);
+    object_layout.push<float>(3);
+    object_layout.push<float>(2);
+    va_object.addbuffer(vbo, object_layout);
+
+   
+    
 
     //texture
     
-    Texture texture("Resources/Textures/image.png");
-    texture.bind(); 
-    //shader constructure takes const reference to a string as input
-    shader first_shader("Resources/Shaders/basics.shader");
-
-    first_shader.bind();
-    first_shader.setuniform4f("in_color", 1.0f, 0.0f, 0.0f, 1.0f);
-
+      Texture texture("Resources/Textures/brick_wall.png");
+      Texture texture2("Resources/Textures/brick_wall_outline.png");
+      texture.bind(); 
+     //shader constructure takes const reference to a string as input
+  
+   
     //texture
-    first_shader.setuniform1i("u_Texture", 0);
+      
+    
+    
+    
 
-    va.unbind();
-    VBO.unbind();
-    ibo.unbind();
-    first_shader.unbind();
-    float r = 0.0f;
-	float increment = 0.05f;
+   //vao_cubes.unbind();
+   //VBO.unbind();
+   //ibo.unbind();
+   //object_shader.unbind();
     Renderer renderer;
 
-    float theta = 0;
-    
-    //
-    float *final_points=new float[number_of_objects *72];
-    for (int i = 0; i < number_of_objects; i++)
-    {
-        circle_points_p[i] = prtcls[i].draw();
-        for (int j = 0; j < 72; j++)
-        { 
-            final_points[i * 72 + j] = circle_points_p[i][j];
-        }
-    }
-    vertexarray vaa;
-    vertexbuffer vb(final_points, 72* number_of_objects * sizeof(float));
-    vertexbufferlayout l;
-    l.push<float>(2);
-    vaa.addbuffer(vb, l);
-    float m = 0.01;
-    shader Draw_points("Resources/Shaders/Draw_points.shader");
-    Draw_points.bind();
   
+    
     //Draw_points.setuniform4f("in_color", 1.0f, 0.0f, 0.0f, 1.0f);
     /* Loop until the user closes the window */
     double previousTime = glfwGetTime();
     int frameCount = 0;
     float frames_per_sec = 60;
     float DeltaTime = frames_per_sec/2000;
+   
+   
+    //light and object colors
+    glm::vec3 lightcolor(1.0, 1.0, 1.0);
+    glm::vec3  objectcolor(1.0f, 0.5f, 0.31f);
+    //multiple cubes 
+    shader light_shader("Resources/Shaders/light.shader");
+    shader object_shader("Resources/Shaders/basics.shader");
 
+        object_shader.setuniform1i("material.diffuse", 0);
+        //texture.unbind();
+        texture2.bind(1);
+        object_shader.setuniform1i("material.specular", 1);
+        light_shader.bind();
+        //bind shader first then only you can set uniforms for the shaders 
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model,glm::vec3(0.5,0.5,0.5));
+        light_shader.setuniformMat4f("u_model", model);
+        light_shader.setuniformMat4f("u_view", view);
+        light_shader.setuniformMat4f("u_projection", projection);
+       
+        light_shader.unbind();
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, objectPos);
+
+        object_shader.bind();
+        object_shader.setuniformMat4f("u_model", model);
+        object_shader.setuniformMat4f("u_view", view);
+        object_shader.setuniformMat4f("u_projection", projection);
+        object_shader.setuniformvec3("objectColor",objectcolor);
+        object_shader.setuniformvec3("lightColor",lightcolor);
+        object_shader.setuniformvec3("lightpos", lightPos);
+        object_shader.setuniformvec3("viewPos", camera.Position);
+        object_shader.setuniformvec3("material.ambient", glm::vec3(0.19f,0.19f,0.19f));
+        object_shader.setuniformvec3("material.diffuse", glm::vec3(0.50754f,0.50754f,0.50754f));
+        object_shader.setuniformvec3("material.specular", glm::vec3(0.508273f, 0.508273f, 0.508273f));
+        object_shader.setuniformvec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+        object_shader.setuniformvec3("light.diffuse", glm::vec3(0.9f, 0.9f, 0.9f)); // darken diffuse light a bit
+        object_shader.setuniformvec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        object_shader.setuniform1f("material.shininess",52.0f);
+        object_shader.unbind();
+        
+   
     while (!glfwWindowShouldClose(window))
     {
-      
+        
+
+        
+        renderer.clear();//clears depth and color buffers
+
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         double currentTime = glfwGetTime();
         frameCount++;
        
@@ -181,42 +242,48 @@ int main(void)
             frameCount = 0;
             previousTime = currentTime;
         }
-       
-        for (int i = 0; i < number_of_objects; i++)
-        {
-            circle_points_p[i] = prtcls[i].draw();
-            for (int j = 0; j < 72; j++)
-            {
-                final_points[i * 72 + j] = circle_points_p[i][j];
-            }
-        }
+       // vbo.bind();
+        //va_object.addbuffer(vbo, object_layout);
+
+        view = camera.GetViewMatrix();
         
        
-       vertexbuffer vb(final_points, 72* number_of_objects * sizeof(float));
-       vaa.addbuffer(vb, l);
-      
-        if (r > 1.0f)
-        {
-            increment = -0.05f;
-        }
-        else if (r < 0.0f)
-        {
-            increment = 0.05f;
-        }
+
+        va_object.bind();
+        light_shader.bind();
+        light_shader.setuniformMat4f("u_view", view);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+       // model = glm::scale(model, glm::vec3(0.1, 0.1, 0.1));
+        light_shader.setuniformMat4f("u_model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        light_shader.unbind();
+        lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
+        lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
+        va_object.bind();
+        object_shader.bind();
+        object_shader.setuniformMat4f("u_view", view);
+        object_shader.setuniformvec3("lightColor", lightcolor);
+        object_shader.setuniformvec3("viewPos", camera.Position);
+        object_shader.setuniformvec3("lightpos", lightPos);
+       //object_shader.setuniformvec3("light.ambient", ambientColor);
+       //object_shader.setuniformvec3("light.diffuse", diffuseColor);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        object_shader.unbind();
         /* Render here */
+       
+        
         ProcessInput(window);
-        renderer.clear();
-        //first_shader.setuniform4f("in_color", r, 0.0f, 0.4f, 1.0f);
+        //renderer.clear();
         //renderer.draw(va, ibo, first_shader);
        
-        m += 0.0001;
-       // std::cout << m << std::endl;
-        glDrawArrays(GL_POINTS, 0, 72 * number_of_objects);
-		r += increment;
+
+        // camera/view transformation
+       
+      
+		
+     
         
-      
-      
-      
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 		
@@ -225,10 +292,62 @@ int main(void)
         /* Poll for and process events */
         glfwPollEvents();
        
-        update(prtcls, number_of_objects,DeltaTime);
-        theta += 0.00001;
     }
 
     glfwTerminate();
     return 0;
+}
+void ProcessInput(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard(LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard(RIGHT, deltaTime);
+}
+
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and 
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+}
+
+
+// glfw: whenever the mouse moves, this callback is called
+// -------------------------------------------------------
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }

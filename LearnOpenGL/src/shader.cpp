@@ -4,6 +4,7 @@
 #include<string>
 #include<sstream>
 #include "Renderer.h"
+
 shader::shader(const std::string filepath): m_filepath(filepath),m_rendererID(0)
 {
     ShaderProgramSource source = ParseShader(filepath);
@@ -18,6 +19,17 @@ void shader::setuniform4f(const std::string& name, float v0, float v1, float v2,
 void shader::setuniform1f(const std::string& name, int value)
 {
     glUniform1f(getuniformlocation(name), value);
+}
+
+void shader::setuniformMat4f(const std::string& name, const glm::mat4& value)
+{
+    glUniformMatrix4fv(getuniformlocation(name), 1, GL_FALSE,&value[0][0]);
+    
+}
+
+void shader::setuniformvec3(const std::string& name, const glm::vec3& value)
+{
+    glUniform3fv(getuniformlocation(name), 1, &value[0]);
 }
 
 void shader::setuniform1i(const std::string& name, int value)

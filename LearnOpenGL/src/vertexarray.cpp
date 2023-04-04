@@ -2,7 +2,7 @@
 #include "Renderer.h"
 vertexarray::vertexarray()
 {
-	glGenVertexArrays(1, &m_rendererID);
+	glGenVertexArrays(1, &m_rendererID);//create 1 vertex buffer and store it's id to m_rendererID
 }
 
 vertexarray::~vertexarray()
