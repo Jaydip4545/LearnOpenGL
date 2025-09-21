@@ -19,9 +19,10 @@ void vertexarray::addbuffer(vertexbuffer& vb, vertexbufferlayout& layout)
 	for (unsigned int i = 0; i < elements.size(); i++)
 	{
 		const auto& element = elements[i];
-		glEnableVertexAttribArray(i);
-		glVertexAttribPointer(i, element.count,element.type,element.normalized?GL_TRUE:GL_FALSE, layout.getstride(), (void*)offset);
+		glEnableVertexAttribArray(attribCount);
+		glVertexAttribPointer(attribCount, element.count,element.type,GL_FALSE, layout.getstride(), (void*)offset);
 		offset += element.count * vertexbufferelement::getsizeoftype(element.type);
+		attribCount++;
 	}
 	
 }

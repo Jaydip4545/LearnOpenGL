@@ -70,6 +70,18 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\Assignments\OpenGL\LearnOpenGL\src\vendors;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\Assignments\OpenGL\LearnOpenGL\src\vendors;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Assignments\OpenGL\LearnOpenGL\src\vendors;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Assignments\OpenGL\LearnOpenGL\src\vendors;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -81,7 +93,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\glfw\lib-vc2015;$(SolutionDir)\Dependencies\glew\lib\Release\Win32</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\glew\lib\Release\Win32;C:\Users\Jaydip\Downloads\Glew and Glut\glew-1.11.0\lib;$(SolutionDir)\Dependencies\glfw\lib-vc2015</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;glfw3.lib;glew32s.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -100,7 +112,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\glfw\lib-vc2015;$(SolutionDir)\Dependencies\glew\lib\Release\Win32</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\glew\lib\Release\Win32;C:\Users\Jaydip\Downloads\Glew and Glut\glew-1.11.0\lib;$(SolutionDir)\Dependencies\glfw\lib-vc2015</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;glfw3.lib;glew32s.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -115,7 +127,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\glfw\lib-vc2015;$(SolutionDir)\Dependencies\glew\lib\Release\Win32</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\glew\lib\Release\Win32;C:\Users\Jaydip\Downloads\Glew and Glut\glew-1.11.0\lib;$(SolutionDir)\Dependencies\glfw\lib-vc2015</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;glfw3.lib;glew32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -134,11 +146,13 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\glfw\lib-vc2015;$(SolutionDir)\Dependencies\glew\lib\Release\Win32</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\glew\lib\Release\Win32;C:\Users\Jaydip\Downloads\Glew and Glut\glew-1.11.0\lib;$(SolutionDir)\Dependencies\glfw\lib-vc2015</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;glfw3.lib;glew32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\MeshSlicer.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\indexbuffer.cpp" />
@@ -150,9 +164,23 @@
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Shaders\basics.shader" />
-    <None Include="Resources\Shaders\Draw_points.shader" />
-    <None Include="Resources\Shaders\light.shader" />
+    <None Include="Resources\Models\1GRM_1.off" />
+    <None Include="Resources\Models\1GRM_16.off" />
+    <None Include="Resources\Models\1GRM_2.off" />
+    <None Include="Resources\Models\1GRM_4.off" />
+    <None Include="Resources\Models\1GRM_8.off" />
+    <None Include="Resources\Models\2OAR_1.off" />
+    <None Include="Resources\Models\2OAR_16.off" />
+    <None Include="Resources\Models\2OAR_2.off" />
+    <None Include="Resources\Models\2OAR_4.off" />
+    <None Include="Resources\Models\2OAR_8.off" />
+    <None Include="Resources\Models\3SY7_1.off" />
+    <None Include="Resources\Models\3SY7_16.off" />
+    <None Include="Resources\Models\3SY7_2.off" />
+    <None Include="Resources\Models\3SY7_4.off" />
+    <None Include="Resources\Models\3SY7_8.off" />
+    <None Include="Resources\Shaders\basic.shader" />
+    <None Include="Resources\Shaders\Slicer.shader" />
     <None Include="src\vendors\glm\detail\func_common.inl" />
     <None Include="src\vendors\glm\detail\func_common_simd.inl" />
     <None Include="src\vendors\glm\detail\func_exponential.inl" />
@@ -291,6 +319,8 @@
     <None Include="src\vendors\glm\gtx\wrap.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\MeshSlicer.h" />
+    <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\shader.h" />
     <ClInclude Include="src\indexbuffer.h" />

@@ -42,10 +42,16 @@
     <ClCompile Include="src\vendors\glm\detail\glm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshSlicer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Shaders\basics.shader" />
-    <None Include="Resources\Shaders\Draw_points.shader" />
+    <None Include="Resources\Shaders\basic.shader" />
+    <None Include="Resources\Shaders\Slicer.shader" />
     <None Include="src\vendors\glm\detail\func_common.inl">
       <Filter>Header Files</Filter>
     </None>
@@ -454,7 +460,21 @@
     <None Include="src\vendors\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="Resources\Shaders\light.shader" />
+    <None Include="Resources\Models\1GRM_1.off" />
+    <None Include="Resources\Models\1GRM_2.off" />
+    <None Include="Resources\Models\1GRM_4.off" />
+    <None Include="Resources\Models\1GRM_8.off" />
+    <None Include="Resources\Models\1GRM_16.off" />
+    <None Include="Resources\Models\2OAR_1.off" />
+    <None Include="Resources\Models\2OAR_2.off" />
+    <None Include="Resources\Models\2OAR_4.off" />
+    <None Include="Resources\Models\2OAR_8.off" />
+    <None Include="Resources\Models\2OAR_16.off" />
+    <None Include="Resources\Models\3SY7_1.off" />
+    <None Include="Resources\Models\3SY7_2.off" />
+    <None Include="Resources\Models\3SY7_4.off" />
+    <None Include="Resources\Models\3SY7_8.off" />
+    <None Include="Resources\Models\3SY7_16.off" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Renderer.h">
@@ -1328,6 +1348,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MeshSlicer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

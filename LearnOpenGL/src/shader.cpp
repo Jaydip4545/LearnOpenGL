@@ -8,7 +8,7 @@
 shader::shader(const std::string filepath): m_filepath(filepath),m_rendererID(0)
 {
     ShaderProgramSource source = ParseShader(filepath);
-    m_rendererID = createshaderprogram(source.VertexSource, source.FragmentSource);
+    m_rendererID = createshaderprogram(source.VertexSource, source.FragmentSource, source.GeometrySource);
 }
 
 void shader::setuniform4f(const std::string& name, float v0, float v1, float v2, float v3)
@@ -32,6 +32,11 @@ void shader::setuniformvec3(const std::string& name, const glm::vec3& value)
     glUniform3fv(getuniformlocation(name), 1, &value[0]);
 }
 
+void shader::setuniformvec4(const std::string& name, const glm::vec4& value)
+{
+    glUniform4fv(getuniformlocation(name), 1, &value[0]);
+}
+
 void shader::setuniform1i(const std::string& name, int value)
 {
     glUniform1i(getuniformlocation(name), value);
@@ -46,17 +51,34 @@ unsigned int shader::createshader(unsigned int type, const std::string& source)
     return shader;
 }
 
-unsigned int shader::createshaderprogram(std::string& vertexshader, std::string& fragmentshader)
+unsigned int shader::createshaderprogram(std::string& vertexshader, std::string& fragmentshader ,std::string& geometryshader)
 {
     int program = glCreateProgram();
     unsigned int vs = createshader(GL_VERTEX_SHADER, vertexshader);
     unsigned int fs = createshader(GL_FRAGMENT_SHADER, fragmentshader);
+    unsigned int gs = createshader(GL_GEOMETRY_SHADER, geometryshader);
     glAttachShader(program, vs);
     glAttachShader(program, fs);
+    glAttachShader(program, gs);
     glLinkProgram(program);
+    int success = 0;
+    char infoLog[1024];
+    // After linking the shader program...
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success) {
+        GLint logLength = 0;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+
+        std::vector<char> infoLog(logLength);
+        glGetProgramInfoLog(program, logLength, NULL, infoLog.data());
+
+        std::cerr << "Shader Program Linking Failed:\n"
+            << infoLog.data() << std::endl;
+    }
     glValidateProgram(program);
     glDeleteShader(vs);
     glDeleteShader(fs);
+    glDeleteShader(gs);
     return program;
 
 }
@@ -67,12 +89,12 @@ ShaderProgramSource shader::ParseShader(const std::string& filepath)
 
     enum class Shadertype
     {
-        NONE = -1, VERTEX = 0, FRAGMENT = 1
+        NONE = -1, VERTEX = 0, FRAGMENT = 1 , GEOMETRY = 2
     };
 
 
     std::string line;
-    std::stringstream ss[2];
+    std::stringstream ss[3];
 
     Shadertype type = Shadertype::NONE;
 
@@ -88,13 +110,17 @@ ShaderProgramSource shader::ParseShader(const std::string& filepath)
             {
                 type = Shadertype::FRAGMENT;
             }
+            else if (line.find("geometry") != std::string::npos)
+            {
+                type = Shadertype::GEOMETRY;
+            }
         }
         else
         {
             ss[(int)type] << line << '\n';
         }
     }
-    return { ss[0].str(),ss[1].str() };
+    return { ss[0].str(),ss[1].str(),ss[2].str()};
 }
 
 

@@ -5,6 +5,7 @@ class vertexarray
 {
 private:
 	unsigned int m_rendererID;
+	int attribCount = 0;
 public:
 	vertexarray();
 	~vertexarray();

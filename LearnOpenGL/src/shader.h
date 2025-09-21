@@ -5,15 +5,17 @@ struct ShaderProgramSource
 {
 	std::string VertexSource;
 	std::string FragmentSource;
+	std::string GeometrySource;
 
 };
 class shader
 {
 private:
-	unsigned int m_rendererID;
+	
 	std::string m_filepath;
 	//caching for uniforms
 public:
+	unsigned int m_rendererID;
 	shader(const std::string filepath);
 	~shader();
 
@@ -26,8 +28,10 @@ public:
 	void setuniform1f(const std::string& name, int value);
 	void setuniformMat4f(const std::string& name,const glm::mat4 &value);
 	void setuniformvec3(const std::string& name, const glm:: vec3 & value);
+	void setuniformvec4(const std::string& name, const glm::vec4& value);
+	//void setuniforvec4Array(const std::string& name, const glm::vec4& value);
 	unsigned int createshader(unsigned int type, const std::string& source);
-	unsigned int createshaderprogram(std::string& vertexshader, std::string& fragmentshader);
+	unsigned int createshaderprogram(std::string& vertexshader, std::string& fragmentshader, std::string& geometryshader);
 	ShaderProgramSource ParseShader(const std::string& filepath);
 	private:
 		unsigned int getuniformlocation(const std::string& name);
